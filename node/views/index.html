@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<title>jQuery File Upload Example</title>
+<style>
+  .bar {
+    height: 18px;
+    background: green;
+}
+</style>
+</head>
+<body>
+<form>
+<input id="fileupload" type="file" name="files[]" data-url="upload/" multiple style="height: 200px; background-color: #f2f2f2;">
+
+<div id="progress">
+    <div class="bar" style="width: 0%;"></div>
+</div>
+
+<div id="files">
+</div>
+
+</form>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="js/jquery.widget.js"></script>
+<script src="js/jquery.iframe-transport.js"></script>
+<script src="js/jquery-file.js"></script>
+<script src="js/upload.js"></script>
+<script>
+$(function () {
+    $('#fileupload').fileupload({
+        // autoUpload: false,
+        dataType: 'json',
+        add: function(e, data) {
+            $files = $("#files");
+            $files.append(data.files[0].name + " <span id='" + slugify(data.files[0].name) + "'>0</span>%<br/>");
+            if (data.autoUpload || (data.autoUpload !== false &&
+            $(this).fileupload('option', 'autoUpload'))) {
+                data.process().done(function () {
+                    data.submit();
+                });
+            }
+        },
+        done: function (e, data) {
+            $.each(data.result.files, function (index, file) {
+                $('<p/>').text(file.name).appendTo(document.body);
+            });
+        },
+        progress: function(e, data){
+          var progress = parseInt(data.loaded / data.total * 100, 10);
+          $("#files").find("#" + slugify(data.files[0].name)).html(progress);
+
+          console.log(data.files[0].name + " : " + progress);
+        }
+    });
+});
+
+function slugify(text)
+{
+  return text.toString().toLowerCase()
+    .replace(/\s+/g, '-')           // Replace spaces with -
+    .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+    .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+    .replace(/^-+/, '')             // Trim - from start of text
+    .replace(/-+$/, '');            // Trim - from end of text
+}
+</script>
+</body> 
+</html>

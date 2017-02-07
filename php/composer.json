@@ -1,0 +1,14 @@
+{
+    "name": "axa/php",
+    "require": {
+        "illuminate/database": "^5.4",
+		"gargron/fileupload": "~1.1.1"
+    },
+    "autoload": {
+    	"classmap": [
+    		"models"
+    	]
+    },
+    "scripts": [
+    ]
+}
