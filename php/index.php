@@ -17,8 +17,8 @@
     <form>
         <!-- input -->
         <input id="fileupload" type="file" name="files[]" data-url="upload.php" multiple style="height: 200px; background-color: #f2f2f2;">
-        <input type="radio" name="setting" value="separate" id="separate" /><label for="">Separate</label>
-        <input type="radio" name="setting" value="single" id="single" /><label for="">Single</label>
+        <input type="radio" name="singleFileUpload" value="false" id="separate" checked /><label for="separate">Separate</label>
+        <input type="radio" name="singleFileUpload" value="true" id="single" /><label for="single">Single</label>
 
         <div id="files">
         </div>

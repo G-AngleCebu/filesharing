@@ -18,6 +18,11 @@ $(document).ready(function () {
         progress: fileUploadProgress,
         progressall: fileUploadProgressAll
     });
+
+    // select a file upload type setting
+    $('input:radio[name="singleFileUpload"]').change(function(){
+    	$('#fileupload').fileupload('option', 'singleFileUploads', helpers.isSingleFileUpload());
+    });
 });
 
 // File Upload callbacks
@@ -40,9 +45,6 @@ function fileUploadAdd(e, data) {
 }
 
 function fileUploadDone(e, data) {
-	console.log(JSON.parse(data.result));
-	// $('#target').html(Mustache.render(fileUploadProgressTemplate, {name: "test"}));
-
 	$.each(data.files, function (index, file) {
 		var slug = helpers.slugify(file.name);
 		$('#' + slug).html(Mustache.render(fileUploadTemplate, {
@@ -67,7 +69,6 @@ function fileUploadProgress(e, data){
 
 function fileUploadProgressAll(e, data){
 	var progress = parseInt(data.loaded / data.total * 100, 10);
-	console.log(progress);
 	$('#progress .bar').css('width', progress + '%');
 }
 
@@ -75,8 +76,7 @@ function fileUploadProgressAll(e, data){
 
 var helpers = {
 	isSingleFileUpload: function() {
-		return true;
-		// return false;
+		return $('input[name="singleFileUpload"]#separate').is(':checked');
 	},
 	slugify: function(text) {
 	  return text.toString().toLowerCase()
