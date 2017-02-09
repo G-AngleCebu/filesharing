@@ -7,10 +7,30 @@ var app = new Vue({
 		uploadGroups: {},
 		uploadGroupId: null
 	},
-	mounted: function (){
+	created: function(){
 		this.uploadGroupId = downloadUid;
-		console.log(this.uploadGroupId);
 
+		if(this.uploadGroupId){
+			$.ajax({
+				url: 'get.php',
+				dataType: 'json',
+				method: 'GET',
+				context: this,
+				data: {
+					uid: this.uploadGroupId
+				},
+				success: function(data){
+					this.addUploadGroup(data);
+				},
+				error: function(error){
+					this.uploadGroupId = null;
+					var response = JSON.parse(error.responseText);
+					alert(response.error);
+				}
+			});
+		}
+	},
+	mounted: function (){
 	    $('#fileupload').fileupload({
 	    	dataType: 'json',
 	        singleFileUploads: this.singleFileUpload,
@@ -38,9 +58,15 @@ var app = new Vue({
 	},
 	methods: {
 		// Vue view methods
+		addUploadGroup(uploadGroup){
+			Vue.set(this.uploadGroups, uploadGroup.id, uploadGroup);
+		},
 		generatePassword(index){
 			Vue.set(this.uploadGroups[index], 'password', this.createARandomPassword());
 			console.log(this.uploadGroups);
+		},
+		shareEmail(index){
+			console.log(this.uploadGroups[index].download_uid);
 		},
 		setPassword(index){
 			var uploadGroup = this.uploadGroups[index];
@@ -64,8 +90,8 @@ var app = new Vue({
 				}
 			});
 		},
-		deleteFile(index, id = null){
-			this.files.splice(index,1);
+		deleteFile(groupIndex, fileIndex, id = null){
+			this.uploadGroups[groupIndex].upload_files.splice(fileIndex, 1);
 
 			if(id){
 				$.ajax({
@@ -125,7 +151,7 @@ var app = new Vue({
 			var uploadedFiles = uploadGroup.upload_files;
 
 			// this.uploadGroups[uploadGroup.id] = uploadGroup;
-			Vue.set(this.uploadGroups, uploadGroup.id, uploadGroup);
+			this.addUploadGroup(uploadGroup);
 
 			// remove the files that finished uploading
 			$.each(data.files, function(index, file){

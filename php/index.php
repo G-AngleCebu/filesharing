@@ -45,41 +45,24 @@
                         {{ file.progress }} / 100%
                     </template>
                 </div>
-                <div class="file-group" v-for="(uploadGroup, index) in uploadGroups">
-                    <h3>Group {{ index }}</h3>
+                <div class="file-group" v-for="(uploadGroup, groupIndex) in uploadGroups">
+                    <h3>Group {{ groupIndex }}</h3>
                     <input v-model.lazy="uploadGroup.password" type="text" placeholder="Password" />
-                    <button v-on:click.prevent="setPassword(index)">Set</button>
-                    <button v-on:click.prevent="generatePassword(index)">Generate password</button>
+                    <button v-on:click.prevent="setPassword(groupIndex)">Set</button>
+                    <button v-on:click.prevent="generatePassword(groupIndex)">Generate password</button>
+                    <button v-on:click.prevent="shareEmail(groupIndex)">Share this URL by email</button>
                     
-                    <div class="file-upload" v-for="(file, index) in uploadGroup.upload_files">
+                    <div class="file-upload" v-for="(file, fileIndex) in uploadGroup.upload_files">
                         <template>
                             <b>[{{ file.id }}] {{ file.file_name }}</b><br/>
                             {{ humanFileSize(file.file_size) }}<br/>
-                            <button v-on:click.prevent="deleteFile(index, file.id)">Delete</button>
+                            <button v-on:click.prevent="deleteFile(groupIndex, fileIndex, file.id)">Delete</button>
                         </template>
                     </div>
                 </div>
             </div>
         </form>
     </div>
-
-    <!-- Mustache.js templates -->
-    <!-- <template id="file-upload-progress">
-        <div class="file-upload" id="{{ slug }}">
-            <b>{{ file.name }}</b><br/>
-            {{ file.size }} bytes<br/>
-            {{ progress }} / 100%
-        </div>
-    </template>
-
-    <template id="file-upload">
-        <div class="file-upload" id="{{ slug }}">
-            <b>{{ file.name }}</b><br/>
-            {{ file.size }} bytes<br/>
-            Password: <input type="text" /><button>Set</button><button>Generate</button><br/>
-            <button>Share</button>
-        </div>
-    </template> -->
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.js"></script> -->
@@ -89,8 +72,8 @@
     <!-- <script src="js/upload.js"></script> -->
     <script>
         var downloadUid = '';
-        <?php if(isset($_GET['id'])): ?>
-        downloadUid = <?php echo $_GET['id']; ?>;
+        <?php if(isset($_GET['uid'])): ?>
+            downloadUid = "<?php echo $_GET['uid']; ?>";
         <?php endif; ?>
     </script>
     <script src="js/app.js"></script>
