@@ -12,9 +12,17 @@ $uploadHandler = new UploadHandler(['print_response' => false]);
 
 // echo json_encode($uploadHandler->response);
 
-$uploadGroup = new UploadGroup;
-$uploadGroup->download_uid = md5(uniqid(rand(), true));
-$uploadGroup->save();
+$uploadGroupId = $_POST['uploadGroupId'];
+
+// echo json_encode($uploadGroupId);
+
+if($uploadGroupId){
+	$uploadGroup = UploadGroup::find($uploadGroupId);
+} else {
+	$uploadGroup = new UploadGroup;
+	$uploadGroup->download_uid = md5(uniqid(rand(), true));
+	$uploadGroup->save();
+}
 
 $uploadFiles = [];
 foreach($uploadHandler->response['files'] as $file){
@@ -27,4 +35,6 @@ foreach($uploadHandler->response['files'] as $file){
 
 $uploadGroup->uploadFiles()->saveMany($uploadFiles);
 
-echo $uploadGroup->uploadFiles->toJson();
+$uploadGroup->load('uploadFiles');
+
+echo $uploadGroup->toJson();

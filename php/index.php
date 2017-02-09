@@ -12,6 +12,17 @@
         [v-cloak] {
             display:none;
         }
+        .file-upload {
+            border: 1px solid #bbb;
+            min-height: 50px;
+            padding: 20px;
+            margin-bottom: 10px;
+        }
+        .file-group {
+            padding: 20px;
+            margin-bottom: 10px;
+            border: 3px solid black;
+        }
     </style>
     <script src="https://unpkg.com/vue/dist/vue.js"></script>
 </head>
@@ -28,17 +39,25 @@
 
             <div id="files">
                 <div class="file-upload" v-for="(file, index) in files">
-                    <template v-if="file.id">
+                    <template>
                         <b>{{ file.name }}</b><br/>
-                        {{ file.size }} bytes<br/>
-                        {{ file.progress }} / 100%
-                        <button v-on:click.prevent="deleteFile(index, file.id)">Delete</button>
-                    </template>
-                    <template v-else>
-                        <b>{{ file.name }}</b><br/>
-                        {{ file.size }} bytes<br/>
+                        {{ humanFileSize(file.size) }}<br/>
                         {{ file.progress }} / 100%
                     </template>
+                </div>
+                <div class="file-group" v-for="(uploadGroup, index) in uploadGroups">
+                    <h3>Group {{ index }}</h3>
+                    <input v-model.lazy="uploadGroup.password" type="text" placeholder="Password" />
+                    <button v-on:click.prevent="setPassword(index)">Set</button>
+                    <button v-on:click.prevent="generatePassword(index)">Generate password</button>
+                    
+                    <div class="file-upload" v-for="(file, index) in uploadGroup.upload_files">
+                        <template>
+                            <b>[{{ file.id }}] {{ file.file_name }}</b><br/>
+                            {{ humanFileSize(file.file_size) }}<br/>
+                            <button v-on:click.prevent="deleteFile(index, file.id)">Delete</button>
+                        </template>
+                    </div>
                 </div>
             </div>
         </form>
@@ -63,13 +82,16 @@
     </template> -->
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.js"></script> -->
     <script src="js/jquery.widget.js"></script>
     <script src="js/jquery.iframe-transport.js"></script>
     <script src="js/jquery-file.js"></script>
     <!-- <script src="js/upload.js"></script> -->
     <script>
-        var downloadUid = <?php echo $_GET['id']; ?>;
+        var downloadUid = '';
+        <?php if(isset($_GET['id'])): ?>
+        downloadUid = <?php echo $_GET['id']; ?>;
+        <?php endif; ?>
     </script>
     <script src="js/app.js"></script>
 </body> 
