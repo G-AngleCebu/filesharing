@@ -2,13 +2,15 @@
     "name": "axa/php",
     "require": {
         "illuminate/database": "^5.4",
-		"gargron/fileupload": "~1.1.1"
+		"gargron/fileupload": "~1.1.1",
+        "slim/slim": "^3.0",
+        "slim/php-view": "^2.2",
+        "apfelbox/php-file-download": "^2.1",
+        "slim/flash": "^0.2.0"
     },
     "autoload": {
     	"classmap": [
     		"models"
     	]
-    },
-    "scripts": [
-    ]
+    }
 }

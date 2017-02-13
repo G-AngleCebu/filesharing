@@ -16,6 +16,6 @@ class UploadFile extends Eloquent
     ];
     
     public function uploadGroup(){
-        return $this->hasMany('App\UploadGroup');
+        return $this->belongsTo('App\UploadGroup');
     }
 }

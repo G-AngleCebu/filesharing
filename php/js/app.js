@@ -95,7 +95,7 @@ var app = new Vue({
 
 			if(id){
 				$.ajax({
-					url: 'delete.php',
+					url: 'api/delete',
 					type: 'POST',
 					data: {id: id},
 					success: function(data){
