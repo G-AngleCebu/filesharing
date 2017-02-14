@@ -5,7 +5,12 @@ var app = new Vue({
 		allProgress: 0,
 		files: [],
 		uploadGroups: {},
-		uploadGroupId: null
+		uploadGroupId: null,
+		email_message: null,
+		email_from: null,
+		email_to: null,
+		email_cc: null,
+		email_bcc: null
 	},
 	created: function(){
 		this.uploadGroupId = downloadUid;
@@ -31,6 +36,8 @@ var app = new Vue({
 		}
 	},
 	mounted: function (){
+		$('.ui.checkbox#separate').checkbox('set checked');
+
 	    $('#fileupload').fileupload({
 	    	dataType: 'json',
 	        singleFileUploads: this.singleFileUpload,
@@ -66,7 +73,52 @@ var app = new Vue({
 			console.log(this.uploadGroups);
 		},
 		shareEmail(index){
-			console.log(this.uploadGroups[index].download_uid);
+			var uploadGroup = this.uploadGroups[index];
+
+			$('.ui.modal').modal({
+				onApprove: function(){
+					var recipient = this.email_to;
+					var sender = this.email_from;
+					var cc = this.email_cc;
+					var bcc = this.email_bcc;
+					var message = this.email_message;
+					var uid = uploadGroup.download_uid;
+					var password = uploadGroup.password || '';
+					var isSeparatePassword = $('.ui.checkbox#separate').checkbox('is checked');
+
+					$.ajax({
+						url: 'api/email',
+						type: 'POST',
+						dataType: 'json',
+						data: {
+							recipient: recipient,
+							sender: sender,
+							cc: cc,
+							bcc: bcc,
+							message: message,
+							uid: uid,
+							password: password,
+							isSeparatePassword: isSeparatePassword ? 1 : 0
+						},
+						success: function(data) {
+							console.log(data);
+						},
+						error: function(data) {
+							console.error(data);
+						}
+					});
+
+					// var mailto = "mailto:";
+					// mailto += recipient;
+					// mailto += "?";
+					// mailto += "cc=" + cc;
+					// mailto += "&bcc=" + bcc;
+					// mailto += "&subject=" + subject;
+					// mailto += "&body=" + message;
+
+					// window.location.href = mailto;
+				}.bind(this)
+			}).modal('show');
 		},
 		setPassword(index){
 			var uploadGroup = this.uploadGroups[index];

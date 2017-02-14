@@ -1,3 +1,4 @@
 vendor
 files
 config/database.php
+config/smtp.php

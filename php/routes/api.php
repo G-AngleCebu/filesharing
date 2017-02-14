@@ -2,8 +2,9 @@
 
 use App\UploadGroup;
 use App\UploadFile;
-require('UploadHandler.php');
+require 'UploadHandler.php';
 require 'config/database.php';
+// require 'PHPMailerAutoload.php';
 
 $app->group('/api', function() use ($app){
 	include 'password_middleware.php';
@@ -61,4 +62,105 @@ $app->group('/api', function() use ($app){
 
 		echo $uploadGroup->toJson();
 	})->add($passwordMiddleware);
+
+	// email
+	$app->post('/email', function($request, $response, $args){
+		$mail = new PHPMailer;
+
+		$postBody = $request->getParsedBody();
+		$from = $postBody['sender'];
+		$message = $postBody['message'];
+		$uid = $postBody['uid'];
+		$recipient = preg_split('/[\ \n\,]+/', $postBody['recipient']);
+		$cc = preg_split('/[\ \n\,]+/', $postBody['cc']);
+		$bcc = preg_split('/[\ \n\,]+/', $postBody['bcc']);
+		$password = $postBody['password'];
+		$isSeparatePassword = $postBody['isSeparatePassword'];
+		$expiryDate = "12/12/20";
+		$result = [];
+
+		include 'config/smtp.php';
+
+		$mail->isSMTP();
+		$mail->Host = 'smtp.gmail.com';
+		$mail->SMTPAuth = true;
+		$mail->Username = SMTP_USERNAME;
+		$mail->Password = SMTP_PASSWORD;
+		$mail->SMTPSecure = 'tls';
+		$mail->Port = 587;
+
+		$mail->setFrom('ganglecebudev@gmail.com', $postBody['sender'] . ' (via G-Angle File Sharing App)');
+
+		// add recipients
+		foreach($recipient as $recipientEmail){ $mail->addAddress($recipientEmail); }
+		foreach($cc as $ccEmail){ $mail->addCC($ccEmail); }
+		foreach($bcc as $bccEmail){ $mail->addBCC($bccEmail); }
+
+		// email content
+		$subject = "File Sharing Notice";
+		if($isSeparatePassword && !empty($password)){
+			$subject .= " #1";
+		}
+
+		$mail->isHTML(true);
+		$mail->Subject = $subject;
+		$body = "<p>Please see the URL below for the files shared to you by {$from}. This file will be deleted on <b>{$expiryDate}</b>.</p>";
+
+		if($isSeparatePassword && !empty($password)){
+			$body .= "<p>The password will be sent out shortly!</p>";
+		}
+
+		// add upload group url
+		$url = url() . "/" . $uid;
+		$body .= "<p><a href='{$url}'>View file(s)</a></p>";
+
+		// add custom message
+		if(!empty($message)){
+			$body .= "<p>{$from} said:</p>";
+			$body .= "<p><i>{$message}</i></p>";
+		}
+
+		$mail->Body = $body; 
+		$mail->AltBody = $message;
+
+		// send main message
+		if(!$mail->send()) {
+			$result = [
+				'error' => 'There was a problem sending the e-mail. Please try again.',
+				'info' => $mail->ErrorInfo
+			];
+		} else {
+			$result = ['success' => 'E-mail sent successfully.'];
+
+			// if separate password URL
+			if($isSeparatePassword && !empty($password)) {
+				$mail->Subject = "File Sharing Notice #2";
+				$mail->Body = "The password is <b>{$password}</b>";
+
+				// add upload group url
+				$url = url() . "/" . $uid;
+				$body .= "<p><a href='{$url}'>View file(s)</a></p>";
+
+				$mail->AltBody = "The password is {$password}";
+
+				// send password email
+				if(!$mail->send()) {
+					$result = [
+					'error' => 'There was a problem sending the e-mail. Please try again.',
+					'info' => $mail->ErrorInfo
+					];
+				}
+			}
+		}
+
+		echo json_encode($result);
+	});
 });
+
+function url(){
+	return sprintf(
+		"%s://%s",
+		isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
+		$_SERVER['SERVER_NAME']
+		);
+}

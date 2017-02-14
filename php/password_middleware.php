@@ -15,7 +15,7 @@ $passwordMiddleware = function($request, $response, $next){
 	}
 
 	$isAuthenticated = false;
-	$message = '';
+	$messages = [];
 
 	if(!empty($uploadGroup->password)){
 		$postBody = $request->getParsedBody();
@@ -24,7 +24,7 @@ $passwordMiddleware = function($request, $response, $next){
 			$isAuthenticated = true;
 		} else if(!empty($postBody['password'])) {
 			// incorrect password
-			$message = 'Incorrect password. Try again.';
+			$messages[] = 'Incorrect password. Try again.';
 		}
 	} else {
 		// upload group doesn't have password
@@ -38,7 +38,7 @@ $passwordMiddleware = function($request, $response, $next){
 		// not authenticated
 		$response = $this->view->render($response, "password.php", [
 			'uid' => $args['uid'],
-			'message' => $message,
+			'messages' => $messages
 		]);
 		return $response;
 	}

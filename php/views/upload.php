@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>File Sharing</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/semantic.min.css">
     <script src="https://unpkg.com/vue/dist/vue.js"></script>
 </head>
 <body>
@@ -44,9 +45,54 @@
                 </div>
             </div>
         </form>
+
+        <div class="ui modal">
+            <i class="close icon"></i>
+            <div class="header">
+                Share URL by E-mail
+            </div>
+            <div class="image content">
+                <div class="ui container">
+                    <form class="ui form twelve wide">
+                        <div class="field">
+                            <label>From</label>
+                            <input v-model="email_from" name="from" type="text" placeholder="Your name"/>
+                        </div>
+                        <div class="field">
+                            <label>To (separate with commas)</label>
+                            <input v-model="email_to" name="to" type="email" placeholder="john@example.com, jane@email.com" multiple />
+                        </div>
+                        <div class="field">
+                            <label>Cc (separate with commas)</label>
+                            <input v-model="email_cc" name="cc" type="email" multiple />
+                        </div>
+                        <div class="field">
+                            <label>Bcc (separate with commas)</label>
+                            <input v-model="email_bcc" name="bcc" type="email" multiple />
+                        </div>
+                        <div class="field">
+                            <label>Message</label>
+                            <textarea v-model="email_message"></textarea>
+                        </div>
+                        <div class="field">
+                            <div id="separate" class="ui checked checkbox">
+                                <input type="checkbox" name="separate">
+                                <label>Send the password in a separate e-mail</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="actions">
+                <div class="container">
+                    <div class="ui primary large approve fluid button">Send</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="js/semantic.min.js"></script>
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.js"></script> -->
     <script src="js/jquery.widget.js"></script>
     <script src="js/jquery.iframe-transport.js"></script>

@@ -1,0 +1,4 @@
+<?php
+
+define("SMTP_USERNAME", "email@example.com");
+define("SMTP_PASSWORD", "password");
