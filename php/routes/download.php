@@ -4,10 +4,10 @@ use App\UploadGroup;
 use App\UploadFile;
 
 $app->group('/download', function() use ($app){
-	include 'password_middleware.php';
+	include 'middleware.php';
 
 	// download single file
-	$app->post('/file/{fileId}', function($request, $response, $args){ 
+	$app->get('/file/{fileId}', function($request, $response, $args){ 
 		$uploadFile = UploadFile::with('uploadGroup')->find($args['fileId']);
 		$uploadGroup = $uploadFile->uploadGroup;
 
@@ -15,10 +15,10 @@ $app->group('/download', function() use ($app){
 
 		$fileDownload = Apfelbox\FileDownload\FileDownload::createFromFilePath('files/'.$filename);
 		$fileDownload->sendDownload($filename);
-	})->add($passwordMiddleware);
+	})->add($sessionMiddleware);
 
 	// download group as zip
-	$app->post('/group/{groupId}', function($request, $response, $args){
+	$app->get('/group/{groupId}', function($request, $response, $args){
 		$uploadGroup = UploadGroup::with('uploadFiles')->find($args['groupId']);
 
 		$files = $uploadGroup->uploadFiles->pluck('file_name');
@@ -50,5 +50,5 @@ $app->group('/download', function() use ($app){
 		header('Content-type: application/zip');
 		readfile($tmp_file);
 		unlink($tmp_file);
-	})->add($passwordMiddleware);
+	})->add($sessionMiddleware);
 });

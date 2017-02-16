@@ -22,6 +22,7 @@
                 <div class="file-upload" v-for="(file, index) in files">
                     <template>
                         <b>{{ file.name }}</b><br/>
+                        <img class="preview" :src="file.previewImageSrc"/>
                         {{ humanFileSize(file.size) }}<br/>
                         {{ file.progress }} / 100%
                     </template>
@@ -38,6 +39,7 @@
                     <div class="file-upload" v-for="(file, fileIndex) in uploadGroup.upload_files">
                         <template>
                             <b>[{{ file.id }}] {{ file.file_name }}</b><br/>
+                            <img class="preview" :src="file.previewImageSrc"/>
                             {{ humanFileSize(file.file_size) }}<br/>
                             <button v-on:click.prevent="deleteFile(groupIndex, fileIndex, file.id)">Delete</button>
                         </template>
@@ -45,6 +47,8 @@
                 </div>
             </div>
         </form>
+
+        <img src="" id="test"/>
 
         <div class="ui modal">
             <i class="close icon"></i>

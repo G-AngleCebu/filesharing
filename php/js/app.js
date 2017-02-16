@@ -123,14 +123,12 @@ var app = new Vue({
 		setPassword(index){
 			var uploadGroup = this.uploadGroups[index];
 			console.log("Set pass " + uploadGroup.password);
-			console.log(uploadGroup);
 
 			$.ajax({
-				url: 'update_password.php',
+				url: '/api/upload_groups/' + uploadGroup.id + '/password',
 				method: 'POST',
 				dataType: 'json',
 				data: {
-					id: uploadGroup.id,
 					password: uploadGroup.password 
 				},
 				success: function(data){
@@ -166,7 +164,6 @@ var app = new Vue({
 			// Append the files to the files array
 			var skipUpload = false;
 			$.each(data.files, function(index, file){
-
 				if(this.hasDuplicate(file.name)){
 					if(!confirm("Overwrite?")) {
 						// don't overwrite, skip to next iteration
@@ -182,8 +179,11 @@ var app = new Vue({
 					name: file.name,
 					size: file.size,
 					slug: this.slugify(file.name),
-					progress: 0
+					previewImageSrc: null
 				});
+
+				var fileElement = this.files[this.files.length - 1];
+				this.setPreviewImageSrc(fileElement, file);
 			}.bind(this));
 
 			// if user pressed cancel on overwrite prompt
@@ -199,11 +199,13 @@ var app = new Vue({
 			}
 		},
 		fileUploadDone(e, data) {
-			var uploadGroup = data.result;
-			var uploadedFiles = uploadGroup.upload_files;
+			var newlyUploadedGroup = data.result;
 
-			// this.uploadGroups[uploadGroup.id] = uploadGroup;
-			this.addUploadGroup(uploadGroup);
+			this.addUploadGroup(newlyUploadedGroup);
+
+			$.each(newlyUploadedGroup.upload_files, function(index, file){
+				this.setPreviewImageSrc(file);
+			}.bind(this));
 
 			// remove the files that finished uploading
 			$.each(data.files, function(index, file){
@@ -217,6 +219,7 @@ var app = new Vue({
 				// this.files[index].progress = progress;
 				var file = this.getFileByFilename(file.name);
 				file.progress = progress;
+
 			// 	var slug = this.slugify(file.name);
 			// 	var progress = parseInt(data.loaded / data.total * 100, 10);
 
@@ -233,6 +236,47 @@ var app = new Vue({
 		},
 
 		// HELPERS
+		setPreviewImageSrc(fileElement, file = null){
+			var audioTypes = ['audio', 'mp3', 'wav', 'wma'];
+			var videoTypes = ['video', 'mp4', 'mov', 'avi'];
+			var imageTypes = ['image', 'jpg', 'image/jpg', 'gif', 'image/gif', 'png', 'image/png', 'jpeg', 'image/jpeg'];
+			var zipTypes = ['zip'];
+			var pdfTypes = ['pdf'];
+			var pptTypes = ['ppt', 'pptx'];
+			var xlsTypes = ['xls', 'xlsx'];
+			var docTypes = ['doc', 'docx'];
+
+			var fileType = file ? file['type'] : fileElement.file_name.split('.').pop();
+			console.log(fileType);
+
+			if(imageTypes.includes(fileType)) {
+				if(file){
+					var reader = new FileReader();
+					reader.onload = function(e){
+						fileElement.previewImageSrc = e.target.result;
+					}
+					reader.readAsDataURL(file);
+				} else {
+					fileElement.previewImageSrc = '/download/file/' + fileElement.id;
+				}
+			} else if(audioTypes.includes(fileType)) {
+				fileElement.previewImageSrc = 'http://placehold.it/100x100?text=audio'
+			} else if(videoTypes.includes(fileType)) {
+				fileElement.previewImageSrc = 'http://placehold.it/100x100?text=video'
+			} else if(pdfTypes.includes(fileType)) {
+				fileElement.previewImageSrc = 'http://placehold.it/100x100?text=pdf'
+			} else if(zipTypes.includes(fileType)) {
+				fileElement.previewImageSrc = 'http://placehold.it/100x100?text=zip'
+			} else if(pptTypes.includes(fileType)) {
+				fileElement.previewImageSrc = 'http://placehold.it/100x100?text=ppt'
+			} else if(xlsTypes.includes(fileType)) {
+				fileElement.previewImageSrc = 'http://placehold.it/100x100?text=xls'
+			} else if(docTypes.includes(fileType)) {
+				fileElement.previewImageSrc = 'http://placehold.it/100x100?text=doc'
+			} else {
+				fileElement.previewImageSrc = 'http://placehold.it/100x100'
+			}
+		},
 		hasDuplicate(filename){
 			var hasDuplicate = false;
 			$.each(this.files, function(index, vueFile){

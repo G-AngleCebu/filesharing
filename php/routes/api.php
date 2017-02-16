@@ -7,7 +7,7 @@ require 'config/database.php';
 // require 'PHPMailerAutoload.php';
 
 $app->group('/api', function() use ($app){
-	include 'password_middleware.php';
+	include 'middleware.php';
 
 	$app->post('/upload', function($request, $response, $args){
 		error_reporting(E_ALL | E_STRICT);
@@ -51,8 +51,8 @@ $app->group('/api', function() use ($app){
 		}
 	});
 
-	// get list of files by upload group id
-	$app->post('/upload_groups/{uid}', function($request, $response, $args){
+	// get list of files by upload group download_uid
+	$app->get('/upload_groups/{uid}', function($request, $response, $args){
 		$uploadGroup = UploadGroup::with('uploadFiles')->where('download_uid', $args['uid'])->first();
 
 		if(!$uploadGroup) {
@@ -61,7 +61,23 @@ $app->group('/api', function() use ($app){
 		}
 
 		echo $uploadGroup->toJson();
-	})->add($passwordMiddleware);
+	})->add($sessionMiddleware);
+
+	// set password of upload group
+	$app->post('/upload_groups/{id}/password', function($request, $response, $args){
+		$uploadGroup = UploadGroup::find($args['id']);
+		$uploadGroup->password = $request->getParsedBody()['password'];
+
+		if($uploadGroup->save()) {
+			$_SESSION[$uploadGroup->download_uid] = true;
+			$_SESSION['LAST_ACTIVITY'] = time();
+			$response = $response->withJson($uploadGroup);
+		} else {
+			$response = $response->withJson(['error' => 'Failed to set new password.']);
+		}
+
+		return $response;
+	});
 
 	// email
 	$app->post('/email', function($request, $response, $args){
