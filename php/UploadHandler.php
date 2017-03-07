@@ -10,6 +10,10 @@
  * http://www.opensource.org/licenses/MIT
  */
 
+use Aws\Common\Aws;
+use Aws\S3\S3Client;
+use Aws\S3\Exception\S3Exception;
+
 class UploadHandler
 {
 
@@ -41,6 +45,17 @@ class UploadHandler
     protected $image_objects = array();
 
     public function __construct($options = null, $initialize = true, $error_messages = null) {
+        // $access_id = "";
+        // $secret = "";
+
+        // putenv("AWS_ACCESS_KEY_ID=$access_id");
+        // putenv("AWS_SECRET_ACCESS_KEY=$secret");
+
+        // $this->s3 = S3Client::factory([
+        //     'region' => 'ap-northeast-1',
+        //     'version' => 'latest'
+        // ]);
+
         $this->response = array();
         $this->options = array(
             'script_url' => $this->get_full_url().'/'.$this->basename($this->get_server_var('SCRIPT_NAME')),
@@ -1079,6 +1094,21 @@ class UploadHandler
                     );
                 } else {
                     move_uploaded_file($uploaded_file, $file_path);
+
+                    // try {
+                    //     $this->s3->putObject(array(
+                    //         // 'ACL' => 'public-read',
+                    //         'Bucket' => 'gec-filesharing',
+                    //         'Body' => fopen($file_path, 'rb'),
+                    //         'Key' => $file->name
+                    //     ));
+
+                    //     unlink($file_path);
+                    // } catch(S3Exception $e){
+                    //     // echo('error!!!');
+                    //     // echo $e->getMessage();
+                    //     // die('S3 exception');
+                    // }
                 }
             } else {
                 // Non-multipart uploads (PUT method support)

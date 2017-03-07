@@ -1,7 +1,7 @@
 var app = new Vue({
 	el: '#app',
 	data: {
-		uploadGroups: {},
+		uploadGroup: {},
 		uid: '',
 		password: '',
 	},
@@ -16,7 +16,7 @@ var app = new Vue({
 				method: 'GET',
 				context: this,
 				success: function(data){
-					this.addUploadGroup(data);
+					this.uploadGroup = data;
 
 					$.each(data.upload_files, function(index, file){
 						this.setPreviewImageSrc(file);
@@ -33,11 +33,6 @@ var app = new Vue({
 		}
 	},
 	methods: {
-		// Vue view methods
-		addUploadGroup(uploadGroup){
-			Vue.set(this.uploadGroups, uploadGroup.id, uploadGroup);
-		},
-
 		// HELPERS
 		humanFileSize(bytes, si) {
 			var thresh = si ? 1000 : 1024;
@@ -51,6 +46,9 @@ var app = new Vue({
 				++u;
 			} while(Math.abs(bytes) >= thresh && u < units.length - 1);
 			return bytes.toFixed(1)+' '+units[u];
+		},
+		humanDateTime(datetime) {
+			return moment(datetime).format('MMMM Do YYYY, h:mm:ss A');
 		},
 		setPreviewImageSrc(fileElement, file = null){
 			var audioTypes = ['audio', 'mp3', 'wav', 'wma'];

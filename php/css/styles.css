@@ -1,6 +1,13 @@
-input#fileupload {
-    height: 200px;
-    background-color: #f2f2f2;
+body.gray {
+    background-color: #eee;
+}
+
+.filehover {
+    border: 1px solid green;
+}
+
+[v-cloak] {
+    display:none;
 }
 
 .bar {
@@ -8,23 +15,26 @@ input#fileupload {
     background: green;
     transition: 0.2s;
 }
-[v-cloak] {
-    display:none;
+
+#file-input {
+    height: 400px;
 }
-.file-upload {
-    border: 1px solid #bbb;
-    min-height: 50px;
-    padding: 20px;
-    margin-bottom: 10px;
+
+#file-input .middle {
+    height: 100%;
 }
-.file-group {
+
+/*.file-group {
     padding: 20px;
     margin-bottom: 10px;
     border: 3px solid black;
-}
+}*/
 
-/* preview thumbnail */
-.file-upload img.preview {
+/*.file-upload img.preview {
     max-width: 60px;
     max-height: 60px;
+}*/
+
+main {
+    margin-top: 80px;
 }

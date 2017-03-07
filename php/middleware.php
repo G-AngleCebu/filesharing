@@ -4,8 +4,6 @@ use App\UploadFile;
 use App\UploadGroup;
 
 $sessionMiddleware = function($request, $response, $next){
-	session_start();
-
 	$args = $request->getAttribute('route')->getArguments();
 
 	if(isset($args['uid']) && $uid = $args['uid']){

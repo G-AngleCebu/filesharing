@@ -1,5 +1,5 @@
 {
-    "name": "axa/php",
+    "name": "file-upload",
     "require": {
         "illuminate/database": "^5.4",
 		"gargron/fileupload": "~1.1.1",
@@ -7,7 +7,8 @@
         "slim/php-view": "^2.2",
         "apfelbox/php-file-download": "^2.1",
         "slim/flash": "^0.2.0",
-        "phpmailer/phpmailer": "^5.2"
+        "phpmailer/phpmailer": "^5.2",
+        "aws/aws-sdk-php": "^3.23"
     },
     "autoload": {
     	"classmap": [

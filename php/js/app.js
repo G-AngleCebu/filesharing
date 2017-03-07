@@ -1,9 +1,12 @@
 var app = new Vue({
 	el: '#app',
 	data: {
+		showFileInput: true,
 		singleFileUpload: false,
 		allProgress: 0,
 		files: [],
+		filesAreHovering: false,
+		hoverTimeout: null,
 		uploadGroups: {},
 		uploadGroupId: null,
 		email_message: null,
@@ -14,6 +17,9 @@ var app = new Vue({
 	},
 	created: function(){
 		this.uploadGroupId = downloadUid;
+		// init checkboxes
+		$('.ui.checkbox#separate').checkbox('set checked');
+		$('.ui.checkbox#singleFileUpload').checkbox();
 
 		if(this.uploadGroupId){
 			$.ajax({
@@ -30,13 +36,15 @@ var app = new Vue({
 				error: function(error){
 					this.uploadGroupId = null;
 					var response = JSON.parse(error.responseText);
-					alert(response.error);
+					// alert(response.error);
 				}
 			});
 		}
 	},
 	mounted: function (){
-		$('.ui.checkbox#separate').checkbox('set checked');
+
+		// init progress bar
+		$('#all-progress').progress({percent: this.allProgress});
 
 	    $('#fileupload').fileupload({
 	    	dataType: 'json',
@@ -47,13 +55,11 @@ var app = new Vue({
 	        	uploadGroupId: this.uploadGroupId
 	        },
 	        fail: function(e, data) {
-	            alert("Upload failed. See console.");
+	            // alert("Upload failed. See console.");
 	            console.error(e);
 	            console.error(data);
 	        },
-	        processdone: function(e, data){
-	        	console.log(data);
-	        },
+	        dragover: this.fileUploadDragOver,
 	        progress: this.fileUploadProgress,
 	        progressall: this.fileUploadProgressAll
 	    });
@@ -68,9 +74,13 @@ var app = new Vue({
 		addUploadGroup(uploadGroup){
 			Vue.set(this.uploadGroups, uploadGroup.id, uploadGroup);
 		},
+		browseFiles(){
+			$('#fileupload').click();			
+		},
 		generatePassword(index){
-			Vue.set(this.uploadGroups[index], 'password', this.createARandomPassword());
-			console.log(this.uploadGroups);
+			console.log(this.uploadGroups[index]);
+			Vue.set(this.uploadGroups[index], 'password', this.generateRandomString());
+			console.log(this.uploadGroups[index]);
 		},
 		shareEmail(index){
 			var uploadGroup = this.uploadGroups[index];
@@ -133,9 +143,11 @@ var app = new Vue({
 				},
 				success: function(data){
 					// TODO
+					alert("Password set successfully.");
 					console.log("Set password successful.");
 				},
 				error: function(data){
+					alert("Error setting password.");
 					console.log(data);
 				}
 			});
@@ -159,8 +171,31 @@ var app = new Vue({
 		},
 		
 		// FILE UPLOAD CALLBACKS
+		fileUploadDragOver(e, data){
+			clearTimeout(this.hoverTimeout);
+			this.hoverTimeout = null;
 
+			if(!this.filesAreHovering){
+				this.fileUploadDragEnter();
+			}
+
+			this.hoverTimeout = setTimeout(function(){
+				this.fileUploadDragLeave();
+			}.bind(this), 100);
+
+		},
+		fileUploadDragEnter(){
+			console.log("ENTER");
+			this.filesAreHovering = true;
+		},
+		fileUploadDragLeave(){
+			console.log("leave");
+			this.filesAreHovering = false;
+			this.hoverTimeout = null;
+		},
 		fileUploadAdd(e, data) {
+			this.showFileInput = false;
+
 			// Append the files to the files array
 			var skipUpload = false;
 			$.each(data.files, function(index, file){
@@ -174,12 +209,15 @@ var app = new Vue({
 					}
 				}
 
+				// add file to files array
 				this.files.push({
 					id: null,
+					key: this.generateRandomGuid(),
 					name: file.name,
 					size: file.size,
 					slug: this.slugify(file.name),
-					previewImageSrc: null
+					previewImageSrc: null,
+					progress: 0
 				});
 
 				var fileElement = this.files[this.files.length - 1];
@@ -199,6 +237,9 @@ var app = new Vue({
 			}
 		},
 		fileUploadDone(e, data) {
+			console.log(data.result);
+			console.log('done');
+			
 			var newlyUploadedGroup = data.result;
 
 			this.addUploadGroup(newlyUploadedGroup);
@@ -216,23 +257,21 @@ var app = new Vue({
 		fileUploadProgress(e, data){
 			$.each(data.files, function (index, file){
 				var progress = parseInt(data.loaded / data.total * 100, 10);
-				// this.files[index].progress = progress;
 				var file = this.getFileByFilename(file.name);
 				file.progress = progress;
 
-			// 	var slug = this.slugify(file.name);
-			// 	var progress = parseInt(data.loaded / data.total * 100, 10);
-
-			// 	$('#' + slug).html(Mustache.render(fileUploadProgressTemplate, {
-			// 		file: file,
-			// 		slug: slug,
-			// 		progress: progress
-			// 	}));
+				$('#progress\\[' + file.key + '\\]').progress({percent: progress});
+				// $('.ui.progress').progress({percent: $(this).data('percent')});
 			}.bind(this));
 		},
 		fileUploadProgressAll(e, data){
 			var progress = parseInt(data.loaded / data.total * 100, 10);
 			this.allProgress = progress;
+			$('#all-progress').progress({percent: this.allProgress});
+
+			if(progress == 100){
+				console.log("DONE ALL");
+			}
 		},
 
 		// HELPERS
@@ -240,14 +279,14 @@ var app = new Vue({
 			var audioTypes = ['audio', 'mp3', 'wav', 'wma'];
 			var videoTypes = ['video', 'mp4', 'mov', 'avi'];
 			var imageTypes = ['image', 'jpg', 'image/jpg', 'gif', 'image/gif', 'png', 'image/png', 'jpeg', 'image/jpeg'];
-			var zipTypes = ['zip'];
+			var zipTypes = ['zip', 'application/zip'];
 			var pdfTypes = ['pdf'];
 			var pptTypes = ['ppt', 'pptx'];
 			var xlsTypes = ['xls', 'xlsx'];
 			var docTypes = ['doc', 'docx'];
 
 			var fileType = file ? file['type'] : fileElement.file_name.split('.').pop();
-			console.log(fileType);
+			// console.log(fileType);
 
 			if(imageTypes.includes(fileType)) {
 				if(file){
@@ -304,6 +343,9 @@ var app = new Vue({
 
 			return index;
 		},
+		copyToClipboard(){
+
+		},
 		humanFileSize(bytes, si = true) {
 			var thresh = si ? 1000 : 1024;
 			if(Math.abs(bytes) < thresh) {
@@ -317,6 +359,9 @@ var app = new Vue({
 			} while(Math.abs(bytes) >= thresh && u < units.length - 1);
 			return bytes.toFixed(1)+' '+units[u];
 		},
+		humanDateTime(datetime) {
+			return moment(datetime).format('MMMM Do YYYY, h:mm:ss a');
+		},
 		slugify: function(text) {
 		  return text.toString().toLowerCase()
 		    .replace(/\s+/g, '-')           // Replace spaces with -
@@ -325,8 +370,11 @@ var app = new Vue({
 		    .replace(/^-+/, '')             // Trim - from start of text
 		    .replace(/-+$/, '');            // Trim - from end of text
 		},
-		createARandomPassword: function(numberOfCharacters = 8){
+		generateRandomString: function(numberOfCharacters = 8){
 			return Math.random().toString(36).slice(-numberOfCharacters);
+		},
+		generateRandomGuid: function(){
+			return Date.now() + this.generateRandomString(4);
 		}
 	}
 });
