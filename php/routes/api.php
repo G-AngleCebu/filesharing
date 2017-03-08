@@ -127,7 +127,7 @@ $app->group('/api', function() use ($app){
 		}
 
 		// add upload group url
-		$url = url() . "/" . $uid;
+		$url = get_base_url() . "/" . $uid;
 		$body .= "<p><a href='{$url}'>View file(s)</a></p>";
 
 		// add custom message
@@ -154,7 +154,7 @@ $app->group('/api', function() use ($app){
 				$mail->Body = "The password is <b>{$password}</b>";
 
 				// add upload group url
-				$url = url() . "/" . $uid;
+				$url = get_base_url() . "/" . $uid;
 				$body .= "<p><a href='{$url}'>View file(s)</a></p>";
 
 				$mail->AltBody = "The password is {$password}";
@@ -172,11 +172,3 @@ $app->group('/api', function() use ($app){
 		echo json_encode($result);
 	});
 });
-
-function url(){
-	return sprintf(
-		"%s://%s",
-		isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
-		$_SERVER['SERVER_NAME']
-		);
-}

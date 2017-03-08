@@ -4,6 +4,7 @@ var app = new Vue({
 		uploadGroup: {},
 		uid: '',
 		password: '',
+		baseurl: baseurl,
 	},
 	created: function(){
 		this.uid = downloadUid;

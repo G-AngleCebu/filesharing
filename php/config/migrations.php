@@ -14,7 +14,7 @@ Capsule::schema()->create('upload_groups', function($table)
 	$table->increments('id');
 	$table->string('download_uid', 32)->unique();
 	// $table->timestamp('upload_date');
-	$table->dateTime('expiration_date');
+	$table->dateTime('expiration_date')->nullable();
 	$table->string('password')->nullable();
 	$table->boolean('validity')->default(true);
 	$table->timestamps();

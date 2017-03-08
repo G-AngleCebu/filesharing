@@ -30,7 +30,7 @@
                 <!-- download zip button -->
                 <div class="right menu">
                     <div class="item">
-                        <a :href="'/download/group/' + uploadGroup.id" class="ui teal button">
+                        <a :href="baseurl + 'download/group/' + uploadGroup.id" class="ui teal button">
                             <i class="icon download"></i>
                             Download all as .zip
                         </a>
@@ -69,11 +69,11 @@
                     <tbody>
                         <template v-for="(file, fileIndex) in uploadGroup.upload_files">
                             <tr>
-                                <td class="one wide"><img class="ui fluid image" :src="file.previewImageSrc"/></td>
+                                <td class="one wide"><img class="ui fluid image" :src="baseurl + file.previewImageSrc"/></td>
                                 <td>{{ file.file_name }}</td>
                                 <td>{{ humanFileSize(file.file_size) }}</td>
                                 <td>{{ humanDateTime(file.created_at) }}</td>
-                                <td><a :href="'/download/file/' + file.id" class="ui basic button">Download</a></td>
+                                <td><a :href="baseurl + 'download/file/' + file.id" class="ui basic button">Download</a></td>
                             </tr>
                         </template>
                     </tbody>
@@ -108,6 +108,14 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="js/moment.js"></script>
     <script src="js/semantic.min.js"></script>
+    <script>
+        window.baseurl = "<?php echo $baseUrl ?>";
+        $.ajaxSetup({
+            beforeSend: function(xhr, options) {
+                options.url = window.baseurl + options.url;
+            }
+        });
+    </script>
     <script>
         var downloadUid = "<?php echo $uid; ?>";
         var password = "<?php echo $p; ?>";

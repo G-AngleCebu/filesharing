@@ -247,11 +247,17 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="js/moment.js"></script>
     <script src="js/semantic.min.js"></script>
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.js"></script> -->
     <script src="js/jquery.widget.js"></script>
     <script src="js/jquery.iframe-transport.js"></script>
     <script src="js/jquery-file.js"></script>
-    <!-- <script src="js/upload.js"></script> -->
+    <script>
+        window.baseurl = "<?php echo $baseUrl ?>";
+        $.ajaxSetup({
+            beforeSend: function(xhr, options) {
+                options.url = window.baseurl + options.url;
+            }
+        });
+    </script>
     <script>
         var downloadUid = '';
         <?php if(isset($_GET['uid'])): ?>

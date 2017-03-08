@@ -1,6 +1,7 @@
 <?php
 
 require 'vendor/autoload.php';
+require_once 'helpers/helpers.php';
 require_once 'middleware.php';
 use App\UploadGroup;
 
@@ -39,16 +40,13 @@ $container['flash'] = function() {
 
 // Index route (upload files)
 $app->get('/', function ($request, $response, $args) {
-	if(isset($_SERVER['HTTPS'])){
-        $protocol = ($_SERVER['HTTPS'] && $_SERVER['HTTPS'] != "off") ? "https" : "http";
-    }
-    else{
-        $protocol = 'http';
-    }
-    $baseUrl = "{$protocol}://{$_SERVER['SERVER_NAME']}{$_SERVER['REQUEST_URI']}";
-	$response = $this->view->render($response, "upload.php", ['baseUrl' => $baseUrl]);
+	$response = $this->view->render($response, "upload.php", [
+		'baseUrl' => get_base_url()
+	]);
 	return $response;
 })->setName('upload_page');
+
+
 
 // enter password
 $app->post('/{uid}', function($request, $response, $args){
@@ -122,7 +120,8 @@ $app->get('/s3', function($req, $res, $args){
 $app->get('/{uid}', function($request, $response, $args){
 	$response = $this->view->render($response, "download.php", [
 		'uid' => $args['uid'],
-		'p' => ''
+		'p' => '',
+		'baseUrl' => get_base_url()
 	]);
 	return $response;
 })->setName('download_page')->add($sessionMiddleware);

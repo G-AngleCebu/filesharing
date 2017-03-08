@@ -296,7 +296,7 @@ var app = new Vue({
 					}
 					reader.readAsDataURL(file);
 				} else {
-					fileElement.previewImageSrc = '/download/file/' + fileElement.id;
+					fileElement.previewImageSrc = baseurl + 'download/file/' + fileElement.id;
 				}
 			} else if(audioTypes.includes(fileType)) {
 				fileElement.previewImageSrc = 'http://placehold.it/100x100?text=audio'
