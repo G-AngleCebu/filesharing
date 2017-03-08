@@ -12,7 +12,7 @@ var app = new Vue({
 
 		if(this.uid){
 			$.ajax({
-				url: '/api/upload_groups/' + this.uid,
+				url: 'api/upload_groups/' + this.uid,
 				dataType: 'json',
 				method: 'GET',
 				context: this,
@@ -51,7 +51,7 @@ var app = new Vue({
 		humanDateTime(datetime) {
 			return moment(datetime).format('MMMM Do YYYY, h:mm:ss A');
 		},
-		setPreviewImageSrc(fileElement, file = null){
+		setPreviewImageSrc(fileElement, file){
 			var audioTypes = ['audio', 'mp3', 'wav', 'wma'];
 			var videoTypes = ['video', 'mp4', 'mov', 'avi'];
 			var imageTypes = ['image', 'jpg', 'image/jpg', 'gif', 'image/gif', 'png', 'image/png', 'jpeg', 'image/jpeg'];

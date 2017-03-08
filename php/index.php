@@ -58,6 +58,7 @@ $app->post('/{uid}', function($request, $response, $args){
 		$uid = $uploadGroup->download_uid;
 	}
 
+
 	$isAuthenticated = false;
 
 	if(!empty($uploadGroup->password)){
@@ -77,7 +78,7 @@ $app->post('/{uid}', function($request, $response, $args){
 	if($isAuthenticated){
 		$_SESSION[$uid] = true;
 		$_SESSION['LAST_ACTIVITY'] = time();
-		$response = $response->withStatus(302)->withHeader("Location", "/{$uid}");
+		$response = $response->withStatus(302)->withHeader("Location", $uid);
 	} else {
 		$passwordRoute = $this->router->pathFor('password', [], ['dest' => $uid]);
 		$response = $response->withStatus(302)->withHeader('Location', $passwordRoute);

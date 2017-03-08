@@ -16,7 +16,7 @@
     <div class="ui middle aligned grid">
             <div class="column">
                 <div class="ui padded text container segment">
-                    <form class="ui large form error" action="/<?php echo $uid; ?>" method="POST">
+                    <form class="ui large form error" action="/<?php echo SUBDIRECTORY . $uid; ?>" method="POST">
                         <h2 class="ui header">The file you are trying to access is password protected.</h2>
 
                         <!-- error message -->

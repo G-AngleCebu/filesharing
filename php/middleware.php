@@ -15,7 +15,7 @@ $sessionMiddleware = function($request, $response, $next){
 	}
 
 	$isAuthenticated = true;
-	
+
 	if(!empty($uploadGroup->password)) { // upload group has password
 		if(empty($_SESSION[$uid])){ // session has not authorized the uid
 			$isAuthenticated = false;
@@ -36,13 +36,12 @@ $sessionMiddleware = function($request, $response, $next){
 			} else {
 				// redirect to password page
 				// $passwordRoute = $this->router->pathFor('password', ['uid' => $uid]);
-				$response = $response->withStatus(302)->withHeader('Location', '/password?dest=' . $uid);
+				$response = $response->withStatus(302)->withHeader('Location', 'password?dest=' . $uid);
 			}
 		}
 	} else {
 		// upload group has no password, can be viewed publicly
 		$response = $next($request, $response);
 	}
-
 	return $response;
 };
