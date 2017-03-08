@@ -55,10 +55,11 @@
                                     {{ humanFileSize(file.size) }}
                                 </div>
                                 <div class="description">
-                                    <div :id="'progress[' + file.key + ']'" name="prog" class="ui teal small progress" :data-percent="file.progress">
+                                    <div :id="'progress[' + file.key + ']'" name="prog" class="ui teal tiny progress" :data-percent="file.progress">
                                         <div class="bar">
-                                            <div class="progress"></div>
                                         </div>
+                                        <div v-if="file.progress < 100"  class="label">Uploading {{ file.progress }}%</div>
+                                        <div v-else class="label">Finishing up...</div>
                                     </div>
                                     <!-- {{ file.progress }} / 100% -->
                                 </div>
@@ -70,90 +71,92 @@
 
             <!-- file list for completed files -->
             <div class="file-group" v-for="(uploadGroup, groupIndex) in uploadGroups">
-                <div class="ui hidden divider"></div>
+                <div v-if="uploadGroup.upload_files.length > 0">
+                    <div class="ui hidden divider"></div>
 
-                <div class="ui borderless top attached menu">
-                    <div class="item">
-                        <div class="ui left icon action input">
-                            <i class="lock icon"></i>
-                            <input type="text" v-model.lazy="uploadGroup.password" placeholder="Password">
-                            <button class="ui basic small button" v-on:click.prevent="generatePassword(groupIndex)">
-                                Generate
-                            </button>
-                            <button class="ui small button" v-on:click.prevent="setPassword(groupIndex)">
-                                Set password
-                            </button>
-                        </div>
-                    </div>
-                    <div class="right menu">
+                    <div class="ui borderless top attached menu">
                         <div class="item">
-                            <!-- share link form -->
-                            <div class="ui action labeled input">
-                                <input readonly type="text" :value="'<?php echo $baseUrl ?>' + uploadGroup.download_uid">
-                                <button class="ui small icon button">
-                                    <i v-on:click="copyToClipboard()" class="copy icon"></i>
+                            <div class="ui left icon action input">
+                                <i class="lock icon"></i>
+                                <input type="text" v-model.lazy="uploadGroup.password" placeholder="Password">
+                                <button class="ui basic small button" v-on:click.prevent="generatePassword(groupIndex)">
+                                    Generate
                                 </button>
-                                <button class="ui small right labeled icon teal button" v-on:click.prevent="shareEmail(groupIndex)">
-                                    <i class="share icon"></i>
-                                    Share URL by email
+                                <button class="ui small button" v-on:click.prevent="setPassword(groupIndex)">
+                                    Set password
                                 </button>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="ui bottom attached segment">
-                <!-- </div> -->
-                <!-- <div class="ui bottom attached segment"> -->
-                    
-                    <!-- Files list -->
-                    <div class="file-upload ui divided items">
-                        <!-- Files LIST COMPACT VIEW -->
-                        <table class="ui very basic table">
-                            <!-- <thead>
-                                <tr>
-                                    <th colspan="2">File</th>
-                                    <th>File size</th>
-                                    <th>Date created</th>
-                                </tr>
-                            </thead> -->
-                            <tbody>
-                                <template v-for="(file, fileIndex) in uploadGroup.upload_files">
-                                    <tr>
-                                        <td class="one wide"><img class="ui fluid image" :src="file.previewImageSrc"/></td>
-                                        <td>{{ file.file_name }}</td>
-                                        <td>{{ humanFileSize(file.file_size) }}</td>
-                                        <td>{{ humanDateTime(file.created_at) }}</td>
-                                        
-                                        <td>
-                                            <button class="ui right floated tiny icon button basic" v-on:click.prevent="deleteFile(groupIndex, fileIndex, file.id)">
-                                                Remove
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </template>
-                            </tbody>
-                        </table>
-
-                        <!-- bigger view -->
-                        <!-- <template v-for="(file, fileIndex) in uploadGroup.upload_files">
+                        <div class="right menu">
                             <div class="item">
-                                <div class="ui tiny image">
-                                    <img class="preview" :src="file.previewImageSrc"/>
-                                </div>
-                                <div class="content">
-                                    <button class="ui right floated tiny icon button basic" v-on:click.prevent="deleteFile(groupIndex, fileIndex, file.id)">
-                                        <i class="remove icon"></i>
-                                        Remove
+                                <!-- share link form -->
+                                <div class="ui action labeled input">
+                                    <input readonly type="text" :value="'<?php echo $baseUrl ?>' + uploadGroup.download_uid">
+                                    <button class="ui small icon button">
+                                        <i v-on:click="copyToClipboard()" class="copy icon"></i>
                                     </button>
-                                    <div class="header">
-                                        {{ file.file_name }}
-                                    </div>
-                                    <div class="meta">
-                                        {{ humanFileSize(file.file_size) }}<br/>
-                                    </div>
+                                    <button class="ui small right labeled icon teal button" v-on:click.prevent="shareEmail(groupIndex)">
+                                        <i class="share icon"></i>
+                                        Share URL by email
+                                    </button>
                                 </div>
                             </div>
-                        </template> -->
+                        </div>
+                    </div>
+                    <div class="ui bottom attached segment">
+                    <!-- </div> -->
+                    <!-- <div class="ui bottom attached segment"> -->
+                        
+                        <!-- Files list -->
+                        <div class="file-upload ui divided items">
+                            <!-- Files LIST COMPACT VIEW -->
+                            <table class="ui very basic table">
+                                <!-- <thead>
+                                    <tr>
+                                        <th colspan="2">File</th>
+                                        <th>File size</th>
+                                        <th>Date created</th>
+                                    </tr>
+                                </thead> -->
+                                <tbody>
+                                    <template v-for="(file, fileIndex) in uploadGroup.upload_files">
+                                        <tr>
+                                            <td class="one wide"><img class="ui fluid image" :src="file.previewImageSrc"/></td>
+                                            <td class="seven wide"><b>{{ file.file_name }}</b></td>
+                                            <td>{{ humanFileSize(file.file_size) }}</td>
+                                            <td>{{ humanDateTime(file.created_at) }}</td>
+                                            
+                                            <td class="one wide">
+                                                <button class="ui right floated tiny icon button basic" v-on:click.prevent="deleteFile(groupIndex, fileIndex, file.id)">
+                                                    Remove
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+
+                            <!-- bigger view -->
+                            <!-- <template v-for="(file, fileIndex) in uploadGroup.upload_files">
+                                <div class="item">
+                                    <div class="ui tiny image">
+                                        <img class="preview" :src="file.previewImageSrc"/>
+                                    </div>
+                                    <div class="content">
+                                        <button class="ui right floated tiny icon button basic" v-on:click.prevent="deleteFile(groupIndex, fileIndex, file.id)">
+                                            <i class="remove icon"></i>
+                                            Remove
+                                        </button>
+                                        <div class="header">
+                                            {{ file.file_name }}
+                                        </div>
+                                        <div class="meta">
+                                            {{ humanFileSize(file.file_size) }}<br/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template> -->
+                        </div>
                     </div>
                 </div>
             </div>
