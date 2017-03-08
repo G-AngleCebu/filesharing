@@ -112,9 +112,11 @@ var app = new Vue({
 						},
 						success: function(data) {
 							console.log(data);
+							alert("E-mail sent successfully.");
 						},
 						error: function(data) {
 							console.error(data);
+							alert("There was a problem sending the e-mail. Please try again.");
 						}
 					});
 

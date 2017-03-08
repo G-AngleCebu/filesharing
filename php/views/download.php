@@ -69,7 +69,7 @@
                     <tbody>
                         <template v-for="(file, fileIndex) in uploadGroup.upload_files">
                             <tr>
-                                <td class="one wide"><img class="ui fluid image" :src="baseurl + file.previewImageSrc"/></td>
+                                <td class="one wide"><img class="ui fluid image" :src="file.previewImageSrc"/></td>
                                 <td>{{ file.file_name }}</td>
                                 <td>{{ humanFileSize(file.file_size) }}</td>
                                 <td>{{ humanDateTime(file.created_at) }}</td>
